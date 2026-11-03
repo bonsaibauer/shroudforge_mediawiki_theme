@@ -45,7 +45,7 @@
 		"stylelint-order": "^8.1.2",
 		"stylelint-plugin-use-baseline": "^1.4.8",
 		"types-mediawiki": "2.1.0",
-		"typescript": "5.9.3",
+		"typescript": "7.0.2",
 		"vitest": "^5.0.5",
 		"vue": "3.4.27"
 	},
