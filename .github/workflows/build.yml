@@ -1,0 +1,21 @@
+name: ShroudForge Manual Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shroudforge-manual-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish stable release
+    uses: ./.github/workflows/release-skin.yml
+    with:
+      channel: stable
+      version: ${{ github.ref_name }}
+      source_ref: ${{ github.ref_name }}
+      source_sha: ${{ github.sha }}

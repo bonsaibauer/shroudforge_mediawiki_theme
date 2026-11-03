@@ -1,0 +1,59 @@
+# git-deploy status file:
+/.deploy
+
+# Editors
+*.kate-swp
+*~
+\#*#
+.#*
+.*.swp
+.project
+cscope.files
+cscope.out
+/.vscode
+## NetBeans
+nbproject*
+project.index
+## Sublime
+sublime-*
+sftp-config.json
+
+# Building & testing
+/composer.lock
+/coverage
+/vendor
+/node_modules
+.eslintcache
+/ShroudForge-*.zip
+/ShroudForge-*.zip.sha256
+/shroudforge-*.zip
+/shroudforge-*.zip.sha256
+
+# Operating systems
+## Mac OS X
+.DS_Store
+## Windows
+Thumbs.db
+
+# Working artifacts
+/design
+
+# Misc
+.buildpath
+.classpath
+.idea
+.metadata*
+.settings
+/static*
+/tags
+/.htaccess
+/.htpasswd
+.eslintcache
+
+# Codex audit cache
+scripts/.cache/
+.playwright-cli/
+
+# Local credentials
+.env*
+*.env

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Ask a question
+    url: https://discord.com/invite/jH2gNJYnt2
+    about: Join the ShroudForge community on Discord.
+  - name: Documentation
+    url: https://github.com/bonsaibauer/shroudforge_wikijs_theme
+    about: Check the documentation for setup guides and configuration options.

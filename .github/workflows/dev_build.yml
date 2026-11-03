@@ -1,0 +1,23 @@
+name: ShroudForge Dev Release
+
+on:
+  push:
+    branches:
+      - '*.*.*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shroudforge-dev-release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Build and publish development prerelease
+    uses: ./.github/workflows/release-skin.yml
+    with:
+      channel: development
+      version: ${{ github.ref_name }}
+      source_ref: ${{ github.ref_name }}
+      source_sha: ${{ github.sha }}

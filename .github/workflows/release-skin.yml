@@ -1,0 +1,134 @@
+name: Build and publish ShroudForge skin release
+
+on:
+  workflow_call:
+    inputs:
+      channel:
+        description: Release channel, stable or development
+        required: true
+        type: string
+      version:
+        description: Release version in MAJOR.MINOR.PATCH format
+        required: true
+        type: string
+      source_ref:
+        description: Version branch used for this release
+        required: true
+        type: string
+      source_sha:
+        description: Exact source commit to package
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: shroudforge-skin-release-${{ inputs.channel }}-${{ inputs.version }}
+  cancel-in-progress: false
+
+jobs:
+  package-and-publish:
+    name: Package and publish skin
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out release source
+        uses: actions/checkout@v7
+        with:
+          ref: ${{ inputs.source_sha }}
+
+      - name: Validate version and release channel
+        id: release
+        shell: bash
+        env:
+          RELEASE_CHANNEL: ${{ inputs.channel }}
+          RELEASE_VERSION: ${{ inputs.version }}
+          SOURCE_REF: ${{ inputs.source_ref }}
+          SOURCE_SHA: ${{ inputs.source_sha }}
+          BUILD_ID: ${{ github.run_id }}
+        run: |
+          if [[ ! "$RELEASE_VERSION" =~ ^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "The selected branch must use MAJOR.MINOR.PATCH, such as 1.0.0." >&2
+            exit 1
+          fi
+          if [[ "$SOURCE_REF" != "$RELEASE_VERSION" ]]; then
+            echo "The version branch name must match the requested release version." >&2
+            exit 1
+          fi
+          if [[ "$RELEASE_CHANNEL" != 'stable' && "$RELEASE_CHANNEL" != 'development' ]]; then
+            echo "The release channel must be stable or development." >&2
+            exit 1
+          fi
+          if [[ "$(git rev-parse HEAD)" != "$SOURCE_SHA" ]]; then
+            echo "The checked out source does not match the requested commit." >&2
+            exit 1
+          fi
+          node <<'NODE'
+          const fs = require( 'node:fs' );
+          const version = process.env.RELEASE_VERSION;
+          const skin = JSON.parse( fs.readFileSync( 'skin.json', 'utf8' ) );
+          const packageJson = JSON.parse( fs.readFileSync( 'package.json', 'utf8' ) );
+          const lock = JSON.parse( fs.readFileSync( 'package-lock.json', 'utf8' ) );
+          const versions = [ skin.version, packageJson.version, lock.version, lock.packages?.['']?.version ];
+
+          if ( versions.some( value => value !== version ) ) {
+            throw new Error( `Release branch ${ version } does not match package versions: ${ versions.join( ', ' ) }` );
+          }
+          NODE
+          if [[ "$RELEASE_CHANNEL" == 'stable' ]]; then
+            tag="v${RELEASE_VERSION}-build.${BUILD_ID}"
+            title="ShroudForge v${RELEASE_VERSION} build ${BUILD_ID}"
+            prerelease=false
+            make_latest=true
+          else
+            tag="v${RELEASE_VERSION}-dev.${BUILD_ID}"
+            title="ShroudForge v${RELEASE_VERSION} dev ${BUILD_ID}"
+            prerelease=true
+            make_latest=false
+          fi
+          {
+            echo "tag=$tag"
+            echo "title=$title"
+            echo "prerelease=$prerelease"
+            echo "make_latest=$make_latest"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Build and verify installable archive
+        id: package
+        shell: bash
+        env:
+          RELEASE_VERSION: ${{ inputs.version }}
+          BUILD_ID: ${{ github.run_id }}
+        run: |
+          archive="shroudforge-${RELEASE_VERSION}-${BUILD_ID}.zip"
+          mkdir -p package/ShroudForge
+          git archive --format=tar HEAD skin.json composer.json README.md CREDITS.md LICENSE i18n includes resources skinStyles templates \
+            | tar -xf - -C package/ShroudForge
+          (cd package && zip -qr "../${archive}" ShroudForge)
+          unzip -t "$archive"
+          unzip -Z1 "$archive" | grep -qx 'ShroudForge/skin.json'
+          unzip -Z1 "$archive" | grep -qx 'ShroudForge/resources/brand/shroudforge-mark.png'
+          sha256sum "$archive" > "${archive}.sha256"
+          sha256sum --check "${archive}.sha256"
+          echo "archive=$archive" >> "$GITHUB_OUTPUT"
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: ${{ steps.release.outputs.title }}
+          target_commitish: ${{ inputs.source_sha }}
+          files: |
+            ${{ steps.package.outputs.archive }}
+            ${{ steps.package.outputs.archive }}.sha256
+          body: |
+            Installable ShroudForge MediaWiki skin.
+
+            Source branch: `${{ inputs.source_ref }}`
+            Source commit: `${{ inputs.source_sha }}`
+            Build ID: `${{ github.run_id }}`
+          generate_release_notes: true
+          prerelease: ${{ steps.release.outputs.prerelease }}
+          make_latest: ${{ steps.release.outputs.make_latest }}
+          overwrite_files: true

@@ -1,0 +1,40 @@
+/**
+ * Dark-mode overrides for theme-variant non-color tokens — all Citizen
+ * extensions. light-dark() only handles color values, so these
+ * non-color tokens (opacity, filter, percentages) get a
+ * separate companion mixin.
+ *
+ * Called at .skin-theme-clientpref-night and at clientpref-os under
+ * prefers-color-scheme: dark.
+ */
+.new-dark-overrides() {
+	--opacity-glass: 0.8;
+	--shadow-opacity: 0.44;
+	--filter-invert: invert( 1 ) hue-rotate( 180deg );
+	--color-surface-0: #050b14;
+	--color-surface-1: #08111d;
+	--color-surface-1--hover: #0b1825;
+	--color-surface-1--active: #122a3d;
+	--color-surface-2: #0b1825;
+	--color-surface-2--hover: #122a3d;
+	--color-surface-2--active: #18344d;
+	--color-surface-3: #122a3d;
+	--color-surface-4: #18344d;
+	--color-neutral-1000: #050b14;
+	--color-neutral-900: #08111d;
+	--color-neutral-800: #0b1825;
+	--color-neutral-700: #122a3d;
+	--color-primary-200: #b5e6fa;
+	--color-primary-300: #8ad9f8;
+	--color-primary-400: #63c9f5;
+	--color-primary-700: #63c9f5;
+	--color-primary-800: #42b8e8;
+	--color-primary-900: #2b86ac;
+	--color-primary-1000: #10354c;
+	--color-inverted-primary: #050b14;
+	--color-progressive-hsl__h: 197;
+	--color-progressive-hsl__s: 87%;
+	--color-progressive-hsl__l: 67%;
+	// Codex blends quiet controls with `multiply` on light, `screen` on dark.
+	--mix-blend-mode-blend: screen;
+}

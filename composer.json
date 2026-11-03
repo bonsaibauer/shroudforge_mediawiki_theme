@@ -1,0 +1,71 @@
+{
+	"name": "bonsaibauer/shroudforge-mediawiki-skin",
+	"type": "mediawiki-skin",
+	"description": "ShroudForge-branded responsive MediaWiki skin based on Citizen.",
+	"keywords": [
+		"wiki",
+		"MediaWiki",
+		"skin"
+	],
+	"homepage": "https://github.com/bonsaibauer/shroudforge_wikijs_theme",
+	"readme": "README.md",
+	"license": "GPL-3.0-or-later",
+	"authors": [
+		{
+			"name": "bonsaibauer",
+			"homepage": "https://github.com/bonsaibauer"
+		},
+		{
+			"name": "alistair3149"
+		},
+		{
+			"name": "Octfx"
+		}
+	],
+	"support": {
+		"wiki": "https://shroudforge.net",
+		"forum": "https://github.com/bonsaibauer/shroudforge_wikijs_theme/discussions",
+		"source": "https://github.com/bonsaibauer/shroudforge_wikijs_theme"
+	},
+	"require": {
+		"composer/installers": "^2|^1.0.1"
+	},
+	"require-dev": {
+		"mediawiki/mediawiki-codesniffer": "52.0.1",
+		"mediawiki/mediawiki-phan-config": "0.20.0",
+		"mediawiki/minus-x": "2.0.1",
+		"php-parallel-lint/php-console-highlighter": "1.0.0",
+		"php-parallel-lint/php-parallel-lint": "1.4.0"
+	},
+	"scripts": {
+		"fix": [
+			"minus-x fix .",
+			"phpcbf"
+		],
+		"test": [
+			"parallel-lint . --exclude node_modules --exclude vendor",
+			"@phpcs",
+			"minus-x check ."
+		],
+		"phan": "phan -d . --long-progress-bar",
+		"phpcs": [
+			"phpcs --config-set ignore_warnings_on_exit 1",
+			"phpcs -sp --cache"
+		],
+		"phpunit": "cd ../../ && composer phpunit -- skins/ShroudForge/tests/phpunit/",
+		"preflight": [
+			"@test",
+			"@phan",
+			"@phpunit"
+		]
+	},
+	"extra": {
+		"installer-name": "ShroudForge"
+	},
+	"config": {
+		"allow-plugins": {
+			"composer/installers": true,
+			"dealerdirect/phpcodesniffer-composer-installer": true
+		}
+	}
+}
