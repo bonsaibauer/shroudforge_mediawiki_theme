@@ -24,6 +24,21 @@
 
 // Main page-specific styles
 .page-Main_Page.action-view {
+	// Let the main page bands reach the viewport edges, as their own styles
+	// constrain the card grid inside each band.
+	.citizen-body-container {
+		--width-layout: 100vw;
+		padding-inline: 0;
+	}
+
+	#mw-content-text {
+		margin-block-start: 0;
+	}
+
+	.citizen-page-footer {
+		display: none;
+	}
+
 	// Disable sticky header
 	#citizen-page-header-sticky-sentinel {
 		display: none;
@@ -49,7 +64,7 @@
 	}
 
 	.citizen-body-container {
-		margin-top: var( --space-xl );
+		margin-top: 0;
 	}
 
 	.citizen-page-actions {
