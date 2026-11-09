@@ -31,7 +31,7 @@
 		"markdown-it": "15.0.3",
 		"markdownlint-cli": "^0.50.0",
 		"oxfmt": "^0.75.0",
-		"oxlint": "^1.90.0",
+		"oxlint": "^1.92.0",
 		"oxlint-tsgolint": "^7.0.2005",
 		"vitepress": "2.0.0-alpha.20",
 		"vitepress-plugin-group-icons": "^1.8.1",
